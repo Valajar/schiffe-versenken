@@ -1,0 +1,163 @@
+body {
+    background-color: #29303c;
+    font-family: 'Roboto', sans-serif;
+    color: ghostwhite;
+}
+
+.button {
+    transition-duration: 0.4s;
+    font-size: 24px;
+    padding: 2rem;
+    border-radius: 4px;
+    color: #fdcd47;
+    background-color: #32415c;
+    border: none;
+    font-weight: normal !important;
+}
+
+.button:hover {
+    background-color: #fdcd47;
+    color: #29303c;
+}
+
+.buttonHit {
+    background-color: green;
+    border: none;
+    border-radius: 4px;
+    padding: 2rem;
+}
+
+.buttonFail {
+    background-color: #bf0000;
+    border: none;
+    border-radius: 4px;
+    padding: 2rem;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-gap: 10px;
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+.sidebar {
+    position: fixed;
+    right: 10%;
+    top: 10%;
+    background-color: #32415c;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 250px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.lifebar {
+    position: fixed;
+    left: 10%;
+    top: 10%;
+    background-color: #32415c;
+    padding: 12px;
+    border-radius: 4px;
+    border: none;
+    color: #bf0000;
+    font-size: 20px;
+}
+
+.itemContainer {
+    position: absolute;
+    left: 20%;
+    top: 10%;
+    background-color: #32415c;
+    padding: 12px;
+    border-radius: 4px;
+    border: none;
+    font-size: 20px;
+}
+
+.itemButton {
+    transition-duration: 0.4s;
+    font-size: 24px;
+    padding: 1rem;
+    border-radius: 4px;
+    color: #fdcd47;
+    background-color: #32415c;
+    border: none;
+    font-weight: normal !important;
+}
+.itemButton:hover {
+    background-color: #fdcd47;
+    color: #29303c;
+    border-radius: 8px;
+}
+
+.itemButtonActive {
+    background-color: aqua;
+    color:#29303c;
+    border-radius: 8px;
+}
+
+.lifebarcontent {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+.sidecontent {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+.leaderboard {
+    background-color: #32415c;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    color: #fdcd47;
+    font-size: 14px;
+    max-height: 30%;
+    overflow-y: auto;
+}
+.leaderboardContainer {
+    position: absolute;
+    background-color: #32415c;
+    padding: 15px;
+    left: 10%;
+    top: 30%;
+    border-radius: 8px;
+    border: none;
+    max-width: 20%;
+}
+
+.importExportButtons {
+    transition-duration: 0.4s;
+    font-size: 24px;
+    padding: 1rem;
+    border-radius: 4px;
+    color: #fdcd47;
+    background-color: #32415c;
+    border: none;
+    text-align: left;
+    font-weight: normal !important;
+    width: 100%;
+}
+.importExportButtons:hover {
+    background-color: #fdcd47;
+    color: #29303c;
+}
+
+
+h2 {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+p {
+    font-size: 14px;
+    margin: 5px 0;
+}
