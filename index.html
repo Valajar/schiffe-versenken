@@ -13,47 +13,25 @@
 </head>
 <body>
     <h1>Schiffe versenken</h1>
+    <div class="diffSelect">
+        <h2>Difficulty:</h2>
+    <select id="difficultySelect" onchange="setDifficulty()">
+        <option value="easy">Leicht</option>
+        <option value="medium">Mittel</option>
+        <option value="hard">Schwer</option>
+    </select></div>
+    <div class="layout">
 
-    <div class="grid-container">
+    <div class="gridContainer" id="gridContainer">
+    <!--hier sind die buttons-->
+    </div>
 
-        <button class="button" id="b1" onclick="onShoot('b1')"></button>
-        <button class="button" id="b2" onclick="onShoot('b2')"></button>
-        <button class="button" id="b3" onclick="onShoot('b3')"></button>
-        <button class="button" id="b4" onclick="onShoot('b4')"></button>
-        <button class="button" id="b5" onclick="onShoot('b5')"></button>
 
-        <button class="button" id="b6" onclick="onShoot('b6')"></button>
-        <button class="button" id="b7" onclick="onShoot('b7')"></button>
-        <button class="button" id="b8" onclick="onShoot('b8')"></button>
-        <button class="button" id="b9" onclick="onShoot('b9')"></button>
-        <button class="button" id="b10" onclick="onShoot('b10')"></button>
-
-        <button class="button" id="b11" onclick="onShoot('b11')"></button>
-        <button class="button" id="b12" onclick="onShoot('b12')"></button>
-        <button class="button" id="b13" onclick="onShoot('b13')"></button>
-        <button class="button" id="b14" onclick="onShoot('b14')"></button>
-        <button class="button" id="b15" onclick="onShoot('b15')"></button>
-
-        <button class="button" id="b16" onclick="onShoot('b16')"></button>
-        <button class="button" id="b17" onclick="onShoot('b17')"></button>
-        <button class="button" id="b18" onclick="onShoot('b18')"></button>
-        <button class="button" id="b19" onclick="onShoot('b19')"></button>
-        <button class="button" id="b20" onclick="onShoot('b20')"></button>
-
-        <button class="button" id="b21" onclick="onShoot('b21')"></button>
-        <button class="button" id="b22" onclick="onShoot('b22')"></button>
-        <button class="button" id="b23" onclick="onShoot('b23')"></button>
-        <button class="button" id="b24" onclick="onShoot('b24')"></button>
-        <button class="button" id="b25" onclick="onShoot('b25')"></button>
-
-        
-        <div class="sidebar">
+                <div class="sidebar">
             <h2>Statistik:</h2>
             <p id="shotsDisplay">Treffer: 0 / Schüsse: 0 / Trefferquote: 0%</p>
             <h2>Score letzte Runde:</h2>
             <p id="scoreDisplay">0</p>
-            <h2>All-time High Score:</h2>
-            <p id="highScoreDisplay">0</p>
         </div>
 
         
@@ -72,9 +50,14 @@
         </div>
         <div class="itemContainer">
             <button class="itemButton" onclick="activateTorpedo()">Torpedo</button>
+            <h2>Übrig:</h2>
+            <p id="torpedoAvailability"></p>
         </div>
 
         
-    <script src="test.js"></script>
+    <script type="module" src="main.js"></script>
+    <script type="module" src="stats.js"></script>
+    
+    <!-- <script src="backup.js"></script> -->
 </body>
 </html>
