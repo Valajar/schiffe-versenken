@@ -1,126 +1,160 @@
-/* 
-Probleme:
-    1. Torpedo Item
-*/
+var numShips = 4; // Anzahl der Schiffe
+let schiffLength = 3; // Länge eines Schiffs
+let schiffe = []; // Array zur Speicherung der Positionen aller Schiffe
+let treffer = 0; // Zähler für Treffer
+let shots = 0; // Zähler für abgegebene Schüsse
+let trefferquote = 0; // Berechnung der Trefferquote
+let loseLifeChance = 0.2; // Wahrscheinlichkeit, ein Leben zu verlieren
+let leben = 3; // Startanzahl der Leben
+let score = 0; // Aktueller Punktestand
+var highScore = 0; // Bester Punktestand
+var torpedoActive = false; // Status des Torpedos
+var torpedoShots = 5; // Anzahl verfügbarer Torpedos
+var rows = 7; // Anzahl der Reihen des Spielfelds
+var cols = 7; // Anzahl der Spalten des Spielfelds
+var diffMult = 0; // Variable für Score-Berechnung
+var currentDifficulty = 'medium'; // Standart-Wert für die Schwierigkeit
+var skipLifeCounter = false;
 
-var numShips = 3;
-let schiffLength = 3;
-let schiffe = [];
-let treffer = 0;
-let shots = 0;
-let trefferquote = 0;
-let loseLifeChance = 0.2;
-let leben = 3;
-let score = 0;
-var highScore = 0;
-var torpedoActive = false;
-var torpedoShots = 1;
+//DOM -> Document Object Model --> So wird die Seite aufgebaut
+document.addEventListener('DOMContentLoaded', () => {
+    createGrid(rows, cols); // Erzeugt das Spielfeld bei Seitenladevorgang
+    gameStart();
+    setDifficulty();
+});
+
+function setDifficulty() {
+    const difficulty = document.getElementById('difficultySelect').value;
+
+    switch (difficulty) {
+        case 'easy':
+            easyDiff();
+            currentDifficulty = 'easy';
+            break;
+        case 'medium':
+            mediumDiff();
+            currentDifficulty = 'medium';
+            break;
+        case 'hard':
+            hardDiff();
+            currentDifficulty = 'hard';
+            break;
+    }
+    createGrid(rows, cols); // Füge diese Zeile hinzu, um das Raster neu zu erstellen
+    restartGame(); // Starte das Spiel neu
+}
 
 
-gameStart();
+//Damit die Variablen außerhalb der "setDifficulty" Funktion callbar sind
+function easyDiff(){
+    rows = 5;
+    cols = 5;
+    numShips = 2;
+    torpedoShots = 1;
+    loseLifeChance = 0.2;
+    diffMult = 1;
+}
+
+function mediumDiff(){
+    rows = 7;
+    cols = 7;
+    numShips = 3;
+    torpedoShots = 3;
+    loseLifeChance = 0.1;
+    diffMult = 2;
+}
+function hardDiff(){
+    rows = 9;
+    cols = 9;
+    numShips = 4;
+    torpedoShots = 4;
+    loseLifeChance = 0.1;
+    diffMult = 3;
+}
+
+function createGrid(rows, cols) {
+    const gridContainer = document.getElementById('gridContainer');
+    gridContainer.innerHTML = ''; // Leert das Grid für ein neues Spiel
+    gridContainer.style.display = 'grid';
+    gridContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`; // Definiert das Grid-Layout
+    gridContainer.style.gap = '5px'; // Abstände zwischen den Zellen
+
+    // Erzeugt die einzelnen Buttons
+    for (let i = 1; i <= rows * cols; i++) {
+        const button = document.createElement('button');
+        button.className = 'button';
+        button.id = `b${i}`;
+        button.onclick = () => onShoot(button.id, skipLifeCounter = false); // Event-Handler für Klicks
+        gridContainer.appendChild(button);
+    }
+}
+
 
 // Entscheidet per Münzwurf, ob horizontales Schiff generiert wird oder vertikal
 function gameStart() {
-    let savedHighScore = localStorage.getItem('highScore');
-    if (savedHighScore !== null) {
-        highScore = parseInt(savedHighScore); // Highscore als Zahl speichern
-    } else {
-        highScore = 0; // Falls noch kein Highscore existiert
-    }
-    updateHighScoreDisplay(); // Zeige den Highscore an
+    schiffe = []; // Setzt die Schiffsliste zurück
+    let savedHighScore = localStorage.getItem('highScore'); // Holt den Highscore aus dem LocalStorage
+    highScore = savedHighScore ? parseInt(savedHighScore) : 0; // Setzt den Highscore
+
+    // Platziert die Schiffe zufällig horizontal oder vertikal
     for (let m = 0; m < numShips; m++) {
-        const isHorizontal = Math.random() > 0.5;
-        console.log(isHorizontal);
-        if (isHorizontal > 0.5) {
+        if (Math.random() > 0.5) {
             horizontalSchiffGeneration();
-            console.log('horizontales Schiff generiert');
         } else {
             vertikalSchiffGeneration();
-            console.log('vertikales Schiff generiert');
         }
     }
-    updateLivesDisplay(); // Initiale Anzeige der Leben
+    updateLivesDisplay(); // Zeigt die verbleibenden Leben an
+    updateTorpedoAvailability(); // Aktualisiert die Verfügbarkeit des Torpedos
 }
 
 // Hinzufügen des Schiffs, wenn Position gültig ist
-function addShipIfValid(start, increment) {
+function addShipIfValid(start, increment, limit, schiffLength) {
     let schiffPositions = [];
     for (let j = 0; j < schiffLength; j++) {
-        schiffPositions.push(start + j * increment);
-    }
-    if (schiffPositions.every(pos => !schiffe.includes('b' + pos))) {
-        for (let j = 0; j < schiffLength; j++) {
-            let schiffId = 'b' + (start + j * increment);
-            schiffe.push(schiffId);
-            console.log('Schiffteil bei button ' + schiffId + ' hinzugefügt');
+        let position = start + j * increment;
+        if (position > limit || schiffe.includes('b' + position)) {
+            return false;
         }
-        return true; // gültige Position
+        schiffPositions.push('b' + position);
     }
-    return false; // ungültige Position
+    schiffe.push(...schiffPositions);
+    console.log(`Schiff platziert: Positionen: ${schiffPositions.join(', ')}`);
+    return true;
 }
 
 function horizontalSchiffGeneration() {
     let validPosition = false;
     while (!validPosition) {
-        let reihe = Math.floor(Math.random() * 5);
-        console.log('reihe: ' + (reihe + 1));
-        switch (reihe) {
-            case 0:
-                reihe = 1;
-                break;
-            case 1:
-                reihe = 6;
-                break;
-            case 2:
-                reihe = 11;
-                break;
-            case 3:
-                reihe = 16;
-                break;
-            case 4:
-                reihe = 21;
-                break;
-        }
-        let spalte = Math.floor(Math.random() * 3);
-        console.log('spalte: ' + (spalte + 1));
-        var start = reihe + spalte;
-        console.log('start: ' + (start));
-        validPosition = addShipIfValid(start, 1);
+        let row = Math.floor(Math.random() * rows);
+        let col = Math.floor(Math.random() * (cols - schiffLength + 1));
+        let start = row * cols + col + 1;
+        // Limit korrekt setzen
+        let limit = start + schiffLength - 1;
+        validPosition = addShipIfValid(start, 1, limit, schiffLength);
     }
 }
 
 function vertikalSchiffGeneration() {
     let validPosition = false;
     while (!validPosition) {
-        let reihe = Math.floor(Math.random() * 3);
-        console.log('reihe: ' + (reihe + 1));
-        switch (reihe) {
-            case 0:
-                reihe = 1;
-                break;
-            case 1:
-                reihe = 6;
-                break;
-            case 2:
-                reihe = 11;
-                break;
-        }
-        let spalte = Math.floor(Math.random() * 5);
-        console.log('spalte: ' + (spalte + 1));
-        var start = reihe + spalte;
-        validPosition = addShipIfValid(start, 5);
+        let row = Math.floor(Math.random() * (rows - schiffLength + 1));
+        let col = Math.floor(Math.random() * cols);
+        let start = row * cols + col + 1;
+        let limit = (rows - 1) * cols + col + 1; // Limit für vertikale Schiffe
+        validPosition = addShipIfValid(start, cols, limit, schiffLength);
     }
 }
+
 
 window.onload = function() {
     updateLeaderboardDisplay();
 };
-
 // Funktion zur Anzeige der Treffer und Schüsse in der Sidebar
 function updateShotsDisplay() {
     const shotsDisplayElement = document.getElementById('shotsDisplay');
     const trefferquoteDisplay = shots > 0 ? ((treffer / shots) * 100).toFixed(2) : 0;
-    shotsDisplayElement.innerText = `Treffer: ${treffer} / Schüsse: ${shots} / Trefferquote: ${trefferquoteDisplay}%`;
+    shotsDisplayElement.innerHTML = `Treffer: ${treffer} <br> Schüsse: ${shots} <br> Trefferquote: ${trefferquoteDisplay}%`;
 }
 
 // Funktion zur Anzeige der Leben in der Sidebar
@@ -135,10 +169,9 @@ function updateScoreDisplay() {
     scoreDisplayElement.innerText = score;
 }
 
-// Funktion zur Anzeige des HighScores
-function updateHighScoreDisplay() {
-    const highScoreDisplayElement = document.getElementById('highScoreDisplay');
-    highScoreDisplayElement.innerText = highScore;
+function updateTorpedoAvailability() {
+    const torpedoAvailabilityElement = document.getElementById('torpedoAvailability');
+    torpedoAvailabilityElement.innerText = torpedoShots;
 }
 
 function updateLeaderboardDisplay() {
@@ -160,18 +193,9 @@ function activateTorpedo() {
     } else {
         console.log("Keine Torpedos mehr verfügbar!");
     }
+    updateTorpedoAvailability();
 }
 
-function activateTorpedo() {
-    if (torpedoShots > 0) {
-        torpedoActive = true;
-        console.log("Torpedo aktiviert! Wähle ein Ziel.");
-    } else {
-        console.log("Keine Torpedos mehr verfügbar!");
-    }
-}
-
-// ===== Haupt-Schussfunktion =====
 function onShoot(id, skipLifeCounter = false) {
     const button = document.getElementById(id);
     
@@ -184,11 +208,12 @@ function onShoot(id, skipLifeCounter = false) {
     if (torpedoActive) {
         torpedoActive = false;
         torpedoShots--;
-        skipLifeCounter = true;
         executeTorpedo(id);
         return;
     }
+
     if (schiffe.includes(id)) {
+        skipLifeCounter = true;
         button.classList.add('buttonHit');
         button.removeAttribute("onclick");
         treffer++;
@@ -196,6 +221,7 @@ function onShoot(id, skipLifeCounter = false) {
         if (!skipLifeCounter) {
             lifeCounter();
         }
+        skipLifeCounter = false;
         if (treffer === numShips * schiffLength) {
             youWin();
         }
@@ -211,30 +237,32 @@ function onShoot(id, skipLifeCounter = false) {
     updateShotsDisplay();
 }
 
-// ===== Torpedo-Logik: Trifft 3x3-Feld =====
-function executeTorpedo(id) {
-    console.log("Torpedo abgefeuert auf " + id);
-    let cellNumber = parseInt(id.substring(1)); // "b12" -> 12
-    const rows = 5; // 5 Reihen
-    const cols = 5; // 5 Spalten
-    const totalCells = rows * cols; // Gesamtanzahl Felder (25)
 
+function executeTorpedo(id) {
+    let cellNumber = parseInt(id.substring(1));
     let targets = [];
 
-    for (let rowOffset = -1; rowOffset <= 1; rowOffset++) {
-        for (let colOffset = -1; colOffset <= 1; colOffset++) {
-            let targetCell = cellNumber + rowOffset * cols + colOffset;
+    let currentRow = Math.floor((cellNumber - 1) / cols);
+    let currentCol = (cellNumber - 1) % cols;
 
-            if (targetCell >= 1 && targetCell <= totalCells) {
-                let sameRow = Math.floor((cellNumber - 1) / cols) === Math.floor((targetCell - 1) / cols);
-                if (colOffset === 0 || sameRow) { 
-                    targets.push("b" + targetCell);
-                }
-            }
+    let offsets = [
+        { row: 0, col: 0 },
+        { row: -1, col: 0 },
+        { row: 1, col: 0 },
+        { row: 0, col: -1 },
+        { row: 0, col: 1 }
+    ];
+
+    offsets.forEach(offset => {
+        let newRow = currentRow + offset.row;
+        let newCol = currentCol + offset.col;
+
+        if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
+            let targetCell = newRow * cols + newCol + 1;
+            targets.push("b" + targetCell);
         }
-    }
+    });
 
-    // Alle Felder in `targets` treffen oder verfehlen
     targets.forEach(targetId => {
         const button = document.getElementById(targetId);
         if (!button) return;
@@ -247,21 +275,12 @@ function executeTorpedo(id) {
         }
         button.removeAttribute("onclick");
     });
-
-    // Statistik aktualisieren
-    shots += targets.length;
-    trefferquote = treffer / shots;
     updateShotsDisplay();
-
-    // Prüfen, ob das Spiel gewonnen wurde
+    updateTorpedoAvailability();
     if (treffer === numShips * schiffLength) {
         youWin();
     }
 }
-
-
-
-
 
 function youWin() {
     score = calculateScore();  
@@ -283,9 +302,7 @@ function youWin() {
 function youLose() {
     score = calculateScore();
     console.log("Aktueller Score: " + score);
-
     updateScoreDisplay(); // Score aktualisieren
-
     setTimeout(() => {
         alert('Dein Score: ' + score);
         promptForNameAndSaveScore();
@@ -297,8 +314,6 @@ function youLose() {
     }, 100);
 }
 
-
-
 // Alles resetten
 function restartGame() {
     schiffe = [];
@@ -306,20 +321,34 @@ function restartGame() {
     shots = 0;
     trefferquote = 0;
     clearBoard();
-    gameStart();
     console.clear();
+    switch (currentDifficulty) {
+        case 'easy':
+            easyDiff();
+            break;
+        case 'medium':
+            mediumDiff();
+            break;
+        case 'hard':
+            hardDiff();
+            break;
+    }
     leben = 3;
-    torpedoShots = 1;
     updateLivesDisplay();
     updateScoreDisplay();
+    updateTorpedoAvailability();
+    updateShotsDisplay();
+    gameStart();
 }
 
-// Setzt alle Attribute zurück
+// Setzt alle Attribute der Buttons zurück
 function clearBoard() {
-    for (let i = 1; i <= 25; i++) {
+    for (let i = 1; i <= rows * cols; i++) { // Dynamische Berechnung basierend auf der Spielfeldgröße
         const button = document.getElementById('b' + i);
-        button.classList.remove('buttonHit', 'buttonFail');
-        button.setAttribute("onclick", "onShoot('b" + i + "')");
+        if (button) { //Buttons bekommen ihre Attribute zurückgesetzt
+            button.classList.remove('buttonHit', 'buttonFail');
+            button.setAttribute("onclick", "onShoot('b" + i + "')");
+        }
     }
 }
 
@@ -335,16 +364,13 @@ if (randomNumber < loseLifeChance) {
 }
 }
 
-
-
 function calculateScore() {
-    let score = (treffer * 500) * (1+leben) - (shots * 50);
+    let score = Math.floor((treffer * 500) * ((1+leben)*0.8) * (diffMult) - (shots * 50));
     if (score < 0) {
         score = 0
     }
     return score;
 }
-
 
 function calcHighScore() {
     let score = calculateScore();
@@ -352,10 +378,7 @@ function calcHighScore() {
         highScore = score;
         localStorage.setItem('highScore', highScore);
     }
-    updateHighScoreDisplay();
 }
-
-
 
 function promptForNameAndSaveScore() {
     const playerName = prompt("Gib deinen Namen ein:");
