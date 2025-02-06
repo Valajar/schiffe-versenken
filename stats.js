@@ -1,6 +1,6 @@
 
 let score = 0;
-import {treffer, shots, leben, diffMult, restartGame, torpedoShots, highScore} from './main.js';
+import {treffer, shots, leben, diffMult, rows, cols, restartGame, torpedoShots, highScore} from './main.js';
 
 window.youWin = function(treffer, leben, diffMult, shots) {
     score = calculateScore(treffer, leben, diffMult, shots);
@@ -121,7 +121,7 @@ window.loadLeaderboardFromFile = loadLeaderboardFromFile;
 export function clearLeaderboard() {
     if (confirm("Bist du sicher, dass du das Leaderboard zurücksetzen möchtest?")) {
         localStorage.removeItem('highScores');
-        updateLeaderboardDisplay();
+        window.updateLeaderboardDisplay();
         alert("Leaderboard wurde zurückgesetzt!");
     }
 }
@@ -141,7 +141,7 @@ window.updateLivesDisplay = updateLivesDisplay;
 // Update shots display
 export function updateShotsDisplay(shots, treffer) {
     const shotsDisplayElement = document.getElementById('shotsDisplay');
-    const trefferquoteDisplay = shots > 0 ? ((treffer / shots) * 100).toFixed(2) : 0;
+    const trefferquoteDisplay = shots > 0 ? Math.min((treffer / shots) * 100, 100).toFixed(2) : 0;
     shotsDisplayElement.innerHTML = `Treffer: ${treffer} <br> Schüsse: ${shots} <br> Trefferquote: ${trefferquoteDisplay}%`;
 }
 window.updateShotsDisplay = updateShotsDisplay;
