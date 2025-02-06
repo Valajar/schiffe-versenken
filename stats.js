@@ -22,7 +22,7 @@ window.youWin = function(treffer, leben, diffMult, shots) {
 window.youLose = function(treffer, leben, diffMult, shots) {
     score = calculateScore(treffer, leben, diffMult, shots);
     console.log("Aktueller Score: " + score);
-    updateScoreDisplay();
+    window.updateScoreDisplay();
     setTimeout(() => {
         alert('Dein Score: ' + score);
         promptForNameAndSaveScore(treffer, leben, diffMult, shots);
