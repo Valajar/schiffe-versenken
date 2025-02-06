@@ -129,7 +129,6 @@ function horizontalSchiffGeneration() {
         let row = Math.floor(Math.random() * rows);
         let col = Math.floor(Math.random() * (cols - schiffLength + 1));
         let start = row * cols + col + 1;
-        // Limit korrekt setzen
         let limit = start + schiffLength - 1;
         validPosition = addShipIfValid(start, 1, limit, schiffLength);
     }
@@ -153,7 +152,7 @@ window.onload = function() {
 // Funktion zur Anzeige der Treffer und Schüsse in der Sidebar
 function updateShotsDisplay() {
     const shotsDisplayElement = document.getElementById('shotsDisplay');
-    const trefferquoteDisplay = shots > 0 ? ((treffer / shots) * 100).toFixed(2) : 0;
+    const trefferquoteDisplay = shots > 0 ? Math.min((treffer / shots) * 100, 100).toFixed(2) : 0;
     shotsDisplayElement.innerHTML = `Treffer: ${treffer} <br> Schüsse: ${shots} <br> Trefferquote: ${trefferquoteDisplay}%`;
 }
 
@@ -236,7 +235,6 @@ function onShoot(id, skipLifeCounter = false) {
     trefferquote = treffer / shots;
     updateShotsDisplay();
 }
-
 
 function executeTorpedo(id) {
     let cellNumber = parseInt(id.substring(1));
