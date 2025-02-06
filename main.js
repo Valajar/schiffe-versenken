@@ -8,8 +8,8 @@ export var leben = 3; // Startanzahl der Leben
 var torpedoActive = false; // Status des Torpedos
 export var torpedoShots = 5; // Anzahl verfügbarer Torpedos
 var skipLifeCounter = false;
-var rows = 7; // Anzahl der Reihen des Spielfelds
-var cols = 7; // Anzahl der Spalten des Spielfelds
+export var rows = 7; // Anzahl der Reihen des Spielfelds
+export var cols = 7; // Anzahl der Spalten des Spielfelds
 export var diffMult = 0; // Variable für Score-Berechnung
 var currentDifficulty = 'medium'; // Standart-Wert für die Schwierigkeit
 
@@ -154,7 +154,7 @@ function activateTorpedo() {
     } else {
         console.log("Keine Torpedos mehr verfügbar!");
     }
-    updateTorpedoAvailability();
+    window.updateTorpedoAvailability();
 }
 
 window.activateTorpedo = activateTorpedo;
